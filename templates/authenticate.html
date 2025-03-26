@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Registration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/authenticate.css') }}">
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-box login">
+            <form id="login-form" method="post">
+                <h1>Login</h1>
+                <div class="input-box">
+                    <input type="text" placeholder="Email" name="email" required>
+                    <i class='bx bxs-user'></i>
+                </div>
+                <div class="input-box">
+                    <input type="password" minlength="8" placeholder="Password" name="password" required>
+                    <i class='bx bxs-lock-alt'></i>
+                </div>
+                <div class="forgot-link">
+                    <a href="#" class="forgot-password-link">Forgot Password?</a>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <p id="login-error-message" style="color: red; position: fixed;width:30vw; text-align: start;"></p>
+            </form>
+        </div>
+
+        <div class="form-box register">
+            <form id="register-form" method="post">
+                <h1>Registration</h1>
+                <div class="input-box">
+                    <input type="text" placeholder="First Name" name="name" pattern="[A-Za-z]+" title="Only letters allowed (no spaces, numbers, or special characters)" required>
+                    <i class='bx bxs-user'></i>
+                </div>
+                <div class="input-box">
+                    <input type="email" placeholder="Email" name="email" required>
+                    <i class='bx bxs-envelope'></i>
+                </div>
+                <div class="input-box">
+                    <input type="password" placeholder="Password" name="password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" title="Must contain at least 8 characters, one uppercase, one lowercase, one number and one special character" required>
+                    <i class='bx bxs-lock-alt'></i>
+                </div>
+                <div class="input-box">
+                    <input type="number" placeholder="Contact Number" name="contact" pattern="[0-9]{10}" required>
+                    <i class='bx bxs-phone'></i>
+                </div>
+                <button type="submit" class="btn">Register</button>
+                <p id="register-error-message" style="color: red; position: fixed; width:30vw; text-align: start;"></p>
+            </form>
+        </div>
+
+        <div class="form-box forgot-password">
+            <form id="forgot-password-form" action="/forgot-password" method="post">
+                <h1>Forgot Password</h1>
+
+                <!-- Email Input Box -->
+                <div class="input-box">
+                    <input type="email" placeholder="Enter your email" name="email" id="forgot-email" required>
+                    <i class='bx bxs-envelope'></i>
+                </div>
+
+                <!-- OTP Input Box (Initially Hidden) -->
+                <div class="input-box" id="otp-box" style="display: none;">
+                    <input type="text" placeholder="Enter OTP" name="otp" pattern="\d{6}" 
+                    title="Please enter exactly 6 digits"
+                    maxlength="6" id="otp-input">
+                    <i class='bx bxs-key'></i>
+                </div>
+
+                <!-- New Password Input Box (Initially Hidden) -->
+                <div class="input-box" id="new-password-box" style="display: none;">
+                    <input type="password" placeholder="Enter new password" name="new_password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" title="Must contain at least 8 characters, one uppercase, one lowercase, one number and one special character" id="new-password">
+                    <i class='bx bxs-lock-alt'></i>
+                </div>
+
+                <!-- Confirm Password Input Box (Initially Hidden) -->
+                <div class="input-box" id="confirm-password-box" style="display: none;">
+                    <input type="password" placeholder="Confirm new password" name="confirm_password" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$" title="Must contain at least 8 characters, one uppercase, one lowercase, one number and one special character" id="confirm-password">
+                    <i class='bx bxs-lock-alt'></i>
+                </div>
+
+                <!-- Reset Password Button -->
+                <button type="submit" class="btn" id="reset-password-btn">Reset Password</button>
+                <p id="forgot-error-message" style="color: red; position: fixed; width: 30vw;text-align: start;"></p>
+            </form>
+        </div>
+
+
+        <div class="toggle-box">
+            <div class="toggle-panel toggle-left">
+                <h1>Hello Welcome!</h1>
+                <p>Don't have an account?</p>
+                <button class="btn register-btn">Register</button>
+            </div>
+            <div class="toggle-panel toggle-right">
+                <h1 class="toggle-message-h1">Welcome Back!</h1>
+                <p class="toggle-message-p">Already have an account?</p>
+                <button class="btn login-btn">Login</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const container = document.querySelector('.container');
+        const registerBtn = document.querySelector('.register-btn');
+        const loginBtn = document.querySelector('.login-btn');
+        const forgotPasswordLink = document.querySelector('.forgot-password-link');
+        const toggleMessageH1 = document.querySelector('.toggle-message-h1');
+        const toggleMessageP = document.querySelector('.toggle-message-p');
+
+        document.querySelector('.login').style.display = 'block'; // Default to show login form
+        document.querySelector('.register').style.display = 'none'; // Ensure register form is hidden
+        document.querySelector('.forgot-password').style.display = 'none'; // Hide forgot password form
+        toggleMessageH1.textContent = "Welcome Back!"; // Reset welcome message
+        toggleMessageP.textContent = "Already have an account?";
+
+        // Function to show the registration form
+        registerBtn.addEventListener('click', () => {
+            container.classList.add('active'); // Add active class to show the register form
+            document.querySelector('.register').style.display = 'block'; // Show registration form
+            document.querySelector('.login').style.display = 'none'; // Hide login form
+            document.querySelector('.forgot-password').style.display = 'none'; // Hide forgot password form
+            toggleMessageH1.textContent = "Welcome Back!"; // Reset welcome message
+            toggleMessageP.textContent = "Already have an account?";
+        });
+
+        // Function to show the login form
+        loginBtn.addEventListener('click', () => {
+            container.classList.remove('active'); // Remove active class to show the login form
+            document.querySelector('.register').style.display = 'none'; // Hide registration form
+            document.querySelector('.login').style.display = 'block'; // Show login form
+            document.querySelector('.forgot-password').style.display = 'none'; // Hide forgot password form
+            toggleMessageH1.textContent = "Welcome Back!"; // Reset welcome message
+            toggleMessageP.textContent = "Already have an account?";
+        });
+
+        // Function to show the forgot password form
+        forgotPasswordLink.addEventListener('click', (e) => {
+            e.preventDefault(); // Prevent the default anchor behavior
+            container.classList.add('active'); // Add active class for transition effect
+            document.querySelector('.forgot-password').style.display = 'block'; // Show forgot password form
+            document.querySelector('.login').style.display = 'none'; // Hide login form
+            document.querySelector('.register').style.display = 'none'; // Hide registration form
+            toggleMessageH1.textContent = "Reset Your Password"; // Change welcome message
+            toggleMessageP.textContent = "Remember your password?";
+        });
+
+        document.getElementById('login-form').addEventListener('submit', async function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            const formData = new FormData(this); // Get form data
+            const loginError = document.getElementById('login-error-message');
+
+            // Send form data to the server using fetch
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(Object.fromEntries(formData)), // Convert FormData to JSON
+            });
+
+            const data = await response.json(); // Parse the JSON response
+
+            if (data.success) {
+                // Redirect to the home page on successful login
+                const redirectUrl = sessionStorage.getItem('redirectUrl') || data.redirect_url || "{{ url_for('index') }}";
+                sessionStorage.removeItem('redirectUrl'); // Clear the stored URL
+                window.location.href = redirectUrl;
+            } else {
+                // Display the error message without reloading the page
+                loginError.textContent = data.message;
+            }
+        });
+
+        document.getElementById('register-form').addEventListener('submit', async function (e) {
+            e.preventDefault(); // Prevent the default form submission
+
+            const formData = new FormData(this);
+            const registerError = document.getElementById('register-error-message');
+            const name = formData.get('name');
+            const contactNumber = formData.get('contact');
+            const password = formData.get('password');
+
+            // Password validation
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+            if (!passwordRegex.test(password)) {
+                registerError.style.color = 'red';
+                registerError.textContent = "Password must be at least 8 characters with one uppercase, one lowercase, one number and one special character";
+                return;
+            }
+
+            // Validate name contains only letters (no spaces, numbers, or special chars)
+            if (!/^[A-Za-z]+$/.test(name)) {
+                registerError.textContent = "Name should contain only letters (no spaces or special characters)";
+                return;
+            }
+
+            // Validate contact number is exactly 10 digits
+            if (!/^\d{10}$/.test(contactNumber)) {
+                registerError.style.color = 'red';
+                registerError.textContent = "Contact number must be exactly 10 digits";
+                return;
+            }
+
+            // Send form data to the server using fetch
+            const response = await fetch('/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(Object.fromEntries(formData)), // Convert FormData to JSON
+            });
+
+            const data = await response.json(); // Parse the JSON response
+
+            if (data.success) {
+                // Redirect to the login page on successful registration
+                window.location.href = '/authenticate?auth_type=login';
+            } else {
+                // Display the error message without reloading the page
+                registerError.textContent = data.message;
+            }
+        });
+
+        // Forgot Password Form Handling
+        document.getElementById('forgot-password-form').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            
+            const emailInput = document.getElementById('forgot-email');
+            const otpBox = document.getElementById('otp-box');
+            const otpInput = document.getElementById('otp-input');
+            const newPasswordBox = document.getElementById('new-password-box');
+            const newPasswordInput = document.getElementById('new-password');
+            const confirmPasswordBox = document.getElementById('confirm-password-box');
+            const confirmPasswordInput = document.getElementById('confirm-password');
+            const resetPasswordBtn = document.getElementById('reset-password-btn');
+            const forgotError = document.getElementById('forgot-error-message');
+            const email = emailInput.value.trim();
+
+            // Track current step
+            let currentStep = 'send-otp';
+            if (otpBox.style.display === 'block' && newPasswordBox.style.display === 'none') {
+                currentStep = 'verify-otp';
+            } else if (newPasswordBox.style.display === 'block') {
+                currentStep = 'update-password';
+            }
+
+            // Step 1: Send OTP
+            if (currentStep === 'send-otp') {
+                if (!email) {
+                    forgotError.textContent = "Email is required";
+                    return;
+                }
+
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    forgotError.textContent = "Please enter a valid email address";
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/forgot-password', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ email: email }),
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        forgotError.textContent = '';
+                        forgotError.style.color = 'green';
+                        forgotError.textContent = "OTP sent to your email!";
+                        
+                        emailInput.disabled = true;
+                        otpBox.style.display = 'block';
+                        resetPasswordBtn.textContent = 'Verify OTP';
+                        
+                        // Auto-focus OTP input
+                        setTimeout(() => otpInput.focus(), 100);
+                    } else {
+                        forgotError.style.color = 'red';
+                        forgotError.textContent = data.message || "Failed to send OTP";
+                    }
+                } catch (error) {
+                    forgotError.style.color = 'red';
+                    forgotError.textContent = "Network error. Please try again.";
+                    console.error("Forgot password error:", error);
+                }
+            }
+            // Step 2: Verify OTP
+            else if (currentStep === 'verify-otp') {
+                const otp = otpInput.value.trim();
+
+                if (!otp) {
+                    forgotError.textContent = "OTP is required";
+                    return;
+                }
+
+                if (!/^\d{6}$/.test(otp)) {
+                    forgotError.textContent = "OTP must be exactly 6 digits";
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/verify-otp', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            email: email, 
+                            otp: otp 
+                        }),
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        forgotError.textContent = '';
+                        forgotError.style.color = 'green';
+                        forgotError.textContent = "OTP verified! Set new password";
+                        
+                        otpBox.style.display = 'none';
+                        newPasswordBox.style.display = 'block';
+                        confirmPasswordBox.style.display = 'block';
+                        resetPasswordBtn.textContent = 'Update Password';
+                        
+                        // Auto-focus new password input
+                        setTimeout(() => newPasswordInput.focus(), 100);
+                    } else {
+                        forgotError.style.color = 'red';
+                        forgotError.textContent = data.message || "Invalid OTP";
+                    }
+                } catch (error) {
+                    forgotError.style.color = 'red';
+                    forgotError.textContent = "Network error. Please try again.";
+                    console.error("OTP verification error:", error);
+                }
+            }
+            // Step 3: Update Password
+            else if (currentStep === 'update-password') {
+                const newPassword = newPasswordInput.value.trim();
+                const confirmPassword = confirmPasswordInput.value.trim();
+
+                if (!newPassword || !confirmPassword) {
+                    forgotError.style.color = 'red';
+                    forgotError.textContent = "Both password fields are required";
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    forgotError.style.color = 'red';
+                    forgotError.textContent = "Passwords do not match";
+                    return;
+                }
+
+                // Strong password validation
+                const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+                if (!passwordRegex.test(newPassword)) {
+                    forgotError.style.color = 'red';
+                    forgotError.textContent = "Password must be at least 8 characters with one uppercase, one lowercase, one number and one special character";
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/update-password', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ 
+                            email: email, 
+                            new_password: newPassword 
+                        }),
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        forgotError.style.color = 'green';
+                        forgotError.textContent = "Password updated successfully! Redirecting to login...";
+                        
+                        // Redirect to login after 2 seconds
+                        setTimeout(() => {
+                            window.location.href = '/authenticate?auth_type=login';
+                        }, 2000);
+                    } else {
+                        forgotError.style.color = 'red';
+                        forgotError.textContent = data.message || "Failed to update password";
+                    }
+                } catch (error) {
+                    forgotError.style.color = 'red';
+                    forgotError.textContent = "Network error. Please try again.";
+                    console.error("Password update error:", error);
+                }
+            }
+        });
+
+        // OTP Input Validation (only digits, max 6 characters)
+        document.getElementById('otp-input')?.addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, ''); // Remove non-digits
+            if (this.value.length > 6) {
+                this.value = this.value.slice(0, 6); // Limit to 6 digits
+            }
+        });
+
+        // Toggle password visibility (optional)
+        document.querySelectorAll('.bx-hide, .bx-show').forEach(icon => {
+            icon.addEventListener('click', function() {
+                const input = this.parentElement.querySelector('input');
+                const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                input.setAttribute('type', type);
+                this.classList.toggle('bx-hide');
+                this.classList.toggle('bx-show');
+            });
+        });
+
+
+    </script>
+</body>
+
+</html>

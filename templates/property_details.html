@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--=============== FAVICON ===============-->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.png') }}" type="image/x-icon">
+
+    <!--=============== BOXICONS ===============-->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <!--=============== SWIPER CSS ===============-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/swiper-bundle.min.css') }}">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/property_details.css') }}">
+
+    <title>Elevate Estate - {{ property.title if property else 'Property Details' }}</title>
+</head>
+
+<body>
+    <!--==================== HEADER ====================-->
+    <header class="header" id="header">
+        <nav class="nav container">
+            <a href="{{ url_for('index') }}" class="nav__logo">
+                Elevate <i class="bx bxs-home-alt-2"></i>
+            </a>
+
+            <div class="nav__menu">
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <a href="{{ url_for('index') }}#home" class="nav__link">
+                            <i class="bx bx-home-alt-2"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+
+                    <li class="nav__item">
+                        <a href="{{ url_for('index') }}#popular" class="nav__link active-link">
+                            <i class="bx bx-building-house"></i>
+                            <span>Properties</span>
+                        </a>
+                    </li>
+
+                    <li class="nav__item">
+                        <a href="{{ url_for('index') }}#value" class="nav__link">
+                            <i class="bx bx-award"></i>
+                            <span>Value</span>
+                        </a>
+                    </li>
+
+                    <li class="nav__item">
+                        <a href="{{ url_for('index') }}#contact" class="nav__link">
+                            <i class="bx bx-phone"></i>
+                            <span>Contact</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <!-- theme change button -->
+            <i class="bx bx-moon change-theme" id="theme-button"></i>
+
+            {% if session.get('valid') %}
+                <span class="nav__link">
+                    {{ session.get('name') }}
+                </span>
+                <a href="{{ url_for('logout') }}" class="button nav__button">
+                    Logout
+                </a>
+            {% else %}
+                <a href="{{ url_for('authenticate') }}" class="button nav__button">
+                    Login
+                </a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <!--==================== MAIN ====================-->
+    <main class="main">
+        <!--==================== PROPERTY DETAILS ====================-->
+        <section class="popular section" id="popular">
+            <div class="container">
+                <h2 class="section__title">
+                    {{ property.title if property else 'Property Details' }}<span>.</span>
+                </h2>
+                <span class="section__subtitle">{{ property.description if property else 'Property Details' }}</span>
+
+                <!-- Property Images Swiper -->
+                <div class="popular__container swiper">
+                    <div class="swiper-wrapper">
+                        {% if property and property.images %}
+                            {% for image in property.images %}
+                                <article class="popular__card swiper-slide">
+                                    <img src="{{ url_for('static', filename=image) }}" alt="{{ property.title }}" class="popular__img">
+                                </article>
+                            {% endfor %}
+                        {% else %}
+                            <article class="popular__card swiper-slide">
+                                <img src="{{ url_for('static', filename='img/default_property.jpg') }}" alt="Default Property Image" class="popular__img">
+                            </article>
+                        {% endif %}
+                    </div>
+
+                    <!-- Swiper Navigation -->
+                    <div class="swiper-button-next">
+                        <i class='bx bx-chevron-right'></i>
+                    </div>
+                    <div class="swiper-button-prev">
+                        <i class="bx bx-chevron-left"></i>
+                    </div>
+                </div>
+
+                <!-- Property Details -->
+                <div class="contact__content">
+                    <div class="contact__card">
+                        <div class="contact__card-box">
+                            <div class="contact__card-info">
+                                <i class='bx bx-money'></i>
+                                <div>
+                                    <h3 class="contact__card-title">
+                                        Price
+                                    </h3>
+                                    <p>₹{{ "{:,}".format(property.price|int) }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="contact__card-box">
+                            <div class="contact__card-info">
+                                <i class='bx bx-map'></i>
+                                <div>
+                                    <h3 class="contact__card-title">
+                                        Location
+                                    </h3>
+                                    <p>{{ property.city if property else 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contact__contact_btn">
+                        <button class="button contact__card-button" id="contact-now-button">
+                            Contact Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!--==================== FOOTER ====================-->
+    <footer class="footer section">
+        <div class="footer__container container grid">
+            <div>
+                <a href="#" class="footer__logo">
+                    Elevate <i class="bx bxs-home-alt-2"></i>
+                </a>
+                <p class="footer__description">
+                    Our vision is to make all people <br>
+                    the best place to live for them.
+                </p>
+            </div>
+            <div class="footer__content">
+                <div>
+                    <h3 class="footer__title">
+                        Company
+                    </h3>
+                    <ul class="footer__links">
+                        <li>
+                            <a href="{{ url_for('index') }}#contact" class="footer__link">Contact Us</a>
+                        </li>
+                        <li>
+                            <a href="{{ url_for('index') }}#value" class="footer__link">Values</a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="footer__title">
+                        Follow us
+                    </h3>
+                    <ul class="footer__social">
+                        <a href="https://www.facebook.com/" target="blank" class="footer__social-link">
+                            <i class="bx bxl-facebook-circle"></i>
+                        </a>
+                        <a href="https://www.instagram.com/" target="blank" class="footer__social-link">
+                            <i class="bx bxl-instagram-alt"></i>
+                        </a>
+                        <a href="https://www.pinterest.com/" target="blank" class="footer__social-link">
+                            <i class="bx bxl-pinterest"></i>
+                        </a>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+        <div class="footer__info container">
+            <span class="footer__copy">
+                &#169; All rigths reserved by Elevate Estate
+            </span>
+        </div>
+    </footer>
+
+    <!--========== SCROLL UP ==========-->
+    <a href="#" class="scrollup" id="scroll-up">
+        <i class="bx bx-chevrons-up"></i>
+    </a>
+
+    <!--=============== SCROLLREVEAL ===============-->
+    <script src="{{ url_for('static', filename='js/scrollreveal.min.js') }}"></script>
+
+    <!--=============== SWIPER JS ===============-->
+    <script src="{{ url_for('static', filename='js/swiper-bundle.min.js') }}"></script>
+
+    <!--=============== MAIN JS ===============-->
+    <script src="{{ url_for('static', filename='js/property_details.js') }}"></script>
+
+    <!-- Custom Script for Contact Now Button -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const contactButton = document.getElementById('contact-now-button');
+            if (contactButton) {
+                contactButton.addEventListener('click', function () {
+                    const propertyId = new URLSearchParams(window.location.search).get('property_id');
+                    const userEmail = "{{ session.get('email') }}"; // Get email from session
+    
+                    if (!userEmail || userEmail === "None") {
+                        // Store the current URL in Flask session via an API call
+                        const redirectUrl = window.location.href;
+                        fetch("{{ url_for('store_data_in_session') }}", {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Requested-With': 'XMLHttpRequest'
+                            },
+                            body: JSON.stringify({
+                                redirect_url: redirectUrl
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                // Redirect to the login page
+                                window.location.href = "{{ url_for('authenticate', auth_type='login') }}";
+                            } else {
+                                alert('Failed to store redirect URL. Please try again.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('An error occurred. Please try again.');
+                        });
+                        return;
+                    }
+    
+                    // First increment the interest count
+                    fetch("{{ url_for('increment_interest') }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            property_id: propertyId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            console.error('Failed to update interest count:', data.message);
+                        }
+                        
+                        // Then proceed with WhatsApp contact
+                        const whatsappMessage = `Hi, I am interested in the property with ID: ${propertyId}. My email is ${userEmail}.`;
+                        const whatsappUrl = `https://wa.me/9574307876?text=${encodeURIComponent(whatsappMessage)}`;
+                        window.open(whatsappUrl, '_blank');
+                    })
+                    .catch(error => {
+                        console.error('Error updating interest count:', error);
+                        // Still proceed with WhatsApp contact even if interest count fails
+                        const whatsappMessage = `Hi, I am interested in the property with ID: ${propertyId}. My email is ${userEmail}.`;
+                        const whatsappUrl = `https://wa.me/9574307876?text=${encodeURIComponent(whatsappMessage)}`;
+                        window.open(whatsappUrl, '_blank');
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>

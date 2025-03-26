@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--=============== FAVICON ===============-->
+    <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.png') }}" type="image/x-icon">
+
+    <!--=============== BOXICONS ===============-->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
+    <!--=============== SWIPER CSS ===============-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/swiper-bundle.min.css') }}">
+
+    <!--=============== CSS ===============-->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/properties.css') }}">
+
+    <title>Elevate Estate</title>
+</head>
+
+<body>
+    <!--==================== HEADER ====================-->
+    <header class="header" id="header">
+        <nav class="nav container">
+            <a href="{{ url_for('index') }}#home" class="nav__logo">
+                Elevate <i class="bx bxs-home-alt-2"></i>
+            </a>
+
+            <div class="nav__menu">
+                <ul class="nav__list">
+                    <li class="nav__item">
+                        <a href="{{ url_for('index') }}#home" class="nav__link">
+                            <i class="bx bx-home-alt-2"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+
+                    <li class="nav__item">
+                        <a href="{{ url_for('index') }}#popular" class="nav__link active-link">
+                            <i class="bx bx-building-house"></i>
+                            <span>Properties</span>
+                        </a>
+                    </li>
+
+                    <li class="nav__item">
+                        <a href="{{ url_for('index') }}#value" class="nav__link">
+                            <i class="bx bx-award"></i>
+                            <span>Value</span>
+                        </a>
+                    </li>
+
+                    <li class="nav__item">
+                        <a href="{{ url_for('index') }}#contact" class="nav__link">
+                            <i class="bx bx-phone"></i>
+                            <span>Contact</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <!-- theme change button -->
+            <i class="bx bx-moon change-theme" id="theme-button"></i>
+
+            {% if session.get('valid') %}
+                <span class="nav__link">
+                    {{ session.get('name') }}
+                </span>
+                <a href="{{ url_for('logout') }}" class="button nav__button">
+                    Logout
+                </a>
+            {% else %}
+                <a href="{{ url_for('authenticate') }}" class="button nav__button">
+                    Login
+                </a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <!--==================== MAIN ====================-->
+    <main class="main">
+
+
+        <!--==================== PROPERTIES ====================-->
+        <section class="properties section" id="properties">
+            <div class="container">
+                <span class="section__subtitle">Available</span>
+                <h2 class="section__title">
+                    Properties<span>.</span>
+                </h2>
+
+                <!-- Add this section right after the section title in properties.html -->
+                <div class="search-and-filters">
+                    <div class="search__box">
+                        <input type="text" id="search-input" placeholder="Search properties...">
+                        <button id="search-button"><i class="bx bx-search"></i></button>
+                        <button id="toggle-filters" class="button button--ghost">
+                            <i class="bx bx-filter-alt"></i> Filters
+                        </button>
+                    </div>
+                    
+                    <div class="filters__container" id="filters-container" style="display: none;">
+                        <div class="filter__controls">
+                            <div class="filter__group">
+                                <label for="property-type">Property Type</label>
+                                <select id="property-type">
+                                    <option value="">All Types</option>
+                                    <!-- Options will be populated by JavaScript -->
+                                </select>
+                            </div>
+                            
+                            <div class="filter__group">
+                                <label for="state">State</label>
+                                <select id="state">
+                                    <option value="">All States</option>
+                                    <!-- Options will be populated by JavaScript -->
+                                </select>
+                            </div>
+                            
+                            <div class="filter__group">
+                                <label for="city">City</label>
+                                <select id="city" disabled>
+                                    <option value="">All Cities</option>
+                                </select>
+                            </div>
+                            
+                            <div class="filter__group">
+                                <label for="price-range">Price Range</label>
+                                <div class="price-range__container">
+                                    <input type="number" id="min-price" placeholder="Min" min="0">
+                                    <span>to</span>
+                                    <input type="number" id="max-price" placeholder="Max" min="0">
+                                </div>
+                            </div>
+                            <div class="price-errors" id="price-errors"></div>
+                            
+                            <div class="filter__actions">
+                                <button id="apply-filters" class="button">Apply Filters</button>
+                                <button id="reset-filters" class="button button--ghost">Reset</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Grid container for properties -->
+                <div class="properties__grid properties__container" id="properties-container">
+                    {% if not no_results %}
+                        {% for property in properties %}
+                            <!-- Your property card template -->
+                        {% endfor %}
+                    {% else %}
+                        <div class="no-results-message">
+                            <p>{{ message }}</p>
+                            <a href="{{ url_for('properties') }}" class="button">Clear Filters</a>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Pagination container -->
+                <div class="pagination" id="pagination">
+                    <!-- Pagination buttons will be dynamically inserted here -->
+                </div>
+            </div>
+        </section>
+
+
+
+        <!--==================== FOOTER ====================-->
+        <footer class="footer section">
+            <div class="footer__container container grid">
+                <div>
+                    <a href="#" class="footer__logo">
+                        Elevate <i class="bx bxs-home-alt-2"></i>
+                    </a>
+                    <p class="footer__description">
+                        Our vision is to make all people <br>
+                        the best place to live for them.
+                    </p>
+                </div>
+                <div class="footer__content">
+                    <div>
+                        <h3 class="footer__title">
+                            Company
+                        </h3>
+                        <ul class="footer__links">
+                            <li>
+                                <a href="{{ url_for('index') }}#contact" class="footer__link">Contact Us</a>
+                            </li>
+                            <li>
+                                <a href="{{ url_for('index') }}#value" class="footer__link">Values</a>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h3 class="footer__title">
+                            Follow us
+                        </h3>
+                        <ul class="footer__social">
+                            <a href="https://www.facebook.com/" target="blank" class="footer__social-link">
+                                <i class="bx bxl-facebook-circle"></i>
+                            </a>
+                            <a href="https://www.instagram.com/" target="blank" class="footer__social-link">
+                                <i class="bx bxl-instagram-alt"></i>
+                            </a>
+                            <a href="https://www.pinterest.com/" target="blank" class="footer__social-link">
+                                <i class="bx bxl-pinterest"></i>
+                            </a>
+                        </ul>
+                    </div>
+    
+                </div>
+            </div>
+            <div class="footer__info container">
+                <span class="footer__copy">
+                    &#169; All rigths reserved by Elevate Estate
+                </span>
+                
+            </div>
+        </footer>
+
+
+        <!--========== SCROLL UP ==========-->
+        <a href="#" class="scrollup" id="scroll-up">
+            <i class="bx bx-chevrons-up"></i>
+        </a>
+
+        <!--=============== SCROLLREVEAL ===============-->
+        <script src="{{ url_for('static', filename='js/scrollreveal.min.js') }}"></script>
+
+        <!--=============== SWIPER JS ===============-->
+        <script src="{{ url_for('static', filename='js/swiper-bundle.min.js') }}"></script>
+
+        <!--=============== MAIN JS ===============-->
+        <script src="{{ url_for('static', filename='js/properties.js') }}"></script>
+</body>
+
+</html>
